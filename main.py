@@ -41,15 +41,19 @@ def udp_server(addr: str, port: int):
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.bind((addr, port))
         while True:
-            data = s.recv(1024)
-            print(data.decode('UTF-8'))
+            data, client_addr = s.recvfrom(1024)
+            print(f"Msg from {client_addr}: {data.decode('UTF-8')}")
+            s.sendto(data, client_addr)
 
 
 def udp_client(addr: str, port: int):
+    print("Chat with yourself")
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
         s.connect((addr, port))
-        msg = input()
+        msg = input("> ")
         s.send(msg.encode('UTF-8'))
+        data = s.recv(1024)
+        print("Received", data.decode('UTF-8'))
 
 
 if __name__ == "__main__":
@@ -65,4 +69,4 @@ if __name__ == "__main__":
     elif mode == '-uc':
         udp_client(addr, port)
     else:
-        raise ValueError('Error arguments')
+        print('Error arguments')
